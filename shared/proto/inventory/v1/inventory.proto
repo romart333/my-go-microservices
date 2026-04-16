@@ -43,7 +43,7 @@ message Part {
   int64 stock_quantity = 6;
 
   // Дата создания
-  Timestamp created_at = 7;
+  google.protobuf.Timestamp created_at = 7;
 }
 
 // Запрос на получение детали по UUID
@@ -59,7 +59,7 @@ message GetPartResponse {
 // Запрос на получение списка деталей
 message ListPartsRequest {
   PartType part_type = 1;
-  option repeated string uuids = 2;
+  repeated string uuids = 2;
 }
 
 // ответ со списками деталей

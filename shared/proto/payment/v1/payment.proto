@@ -22,9 +22,9 @@ enum PaymentMethod {
 // Запрос на оплату заказа
 message PayOrderRequest {
   // UUID заказа
-  required string order_uuid = 1;
+  string order_uuid = 1;
   // способ оплаты
-  required PaymentMethod payment_method = 2;
+  PaymentMethod payment_method = 2;
 }
 
 // ответ на оплату заказа
