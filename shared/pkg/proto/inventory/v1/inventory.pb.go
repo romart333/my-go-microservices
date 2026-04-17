@@ -324,7 +324,7 @@ func (x *ListPartsRequest) GetUuids() []string {
 // ответ со списками деталей
 type ListPartsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Part          []*Part                `protobuf:"bytes,1,rep,name=part,proto3" json:"part,omitempty"`
+	Parts         []*Part                `protobuf:"bytes,1,rep,name=parts,proto3" json:"parts,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -359,9 +359,9 @@ func (*ListPartsResponse) Descriptor() ([]byte, []int) {
 	return file_inventory_v1_inventory_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *ListPartsResponse) GetPart() []*Part {
+func (x *ListPartsResponse) GetParts() []*Part {
 	if x != nil {
-		return x.Part
+		return x.Parts
 	}
 	return nil
 }
@@ -386,9 +386,9 @@ const file_inventory_v1_inventory_proto_rawDesc = "" +
 	"\x04part\x18\x01 \x01(\v2\x12.inventory.v1.PartR\x04part\"]\n" +
 	"\x10ListPartsRequest\x123\n" +
 	"\tpart_type\x18\x01 \x01(\x0e2\x16.inventory.v1.PartTypeR\bpartType\x12\x14\n" +
-	"\x05uuids\x18\x02 \x03(\tR\x05uuids\";\n" +
-	"\x11ListPartsResponse\x12&\n" +
-	"\x04part\x18\x01 \x03(\v2\x12.inventory.v1.PartR\x04part*{\n" +
+	"\x05uuids\x18\x02 \x03(\tR\x05uuids\"=\n" +
+	"\x11ListPartsResponse\x12(\n" +
+	"\x05parts\x18\x01 \x03(\v2\x12.inventory.v1.PartR\x05parts*{\n" +
 	"\bPartType\x12\x19\n" +
 	"\x15PART_TYPE_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0ePART_TYPE_HULL\x10\x01\x12\x14\n" +
@@ -427,7 +427,7 @@ var file_inventory_v1_inventory_proto_depIdxs = []int32{
 	6, // 1: inventory.v1.Part.created_at:type_name -> google.protobuf.Timestamp
 	1, // 2: inventory.v1.GetPartResponse.part:type_name -> inventory.v1.Part
 	0, // 3: inventory.v1.ListPartsRequest.part_type:type_name -> inventory.v1.PartType
-	1, // 4: inventory.v1.ListPartsResponse.part:type_name -> inventory.v1.Part
+	1, // 4: inventory.v1.ListPartsResponse.parts:type_name -> inventory.v1.Part
 	2, // 5: inventory.v1.InventoryService.GetPart:input_type -> inventory.v1.GetPartRequest
 	4, // 6: inventory.v1.InventoryService.ListParts:input_type -> inventory.v1.ListPartsRequest
 	3, // 7: inventory.v1.InventoryService.GetPart:output_type -> inventory.v1.GetPartResponse

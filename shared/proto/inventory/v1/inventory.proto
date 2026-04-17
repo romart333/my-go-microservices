@@ -64,5 +64,5 @@ message ListPartsRequest {
 
 // ответ со списками деталей
 message ListPartsResponse {
-  repeated Part part = 1;
+  repeated Part parts = 1;
 }
