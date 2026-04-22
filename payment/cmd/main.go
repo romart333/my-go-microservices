@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
 
-	svc "github.com/romart333/my-go-microservices/payment/pkg/service"
+	svc "github.com/romart333/my-go-microservices/payment/pkg/app/service"
 	paymentv1 "github.com/romart333/my-go-microservices/shared/pkg/proto/payment/v1"
 )
 
@@ -57,6 +57,7 @@ func main() {
 		slog.Info("запуск PaymentService", "адрес", grpcAddress)
 		if err := grpcServer.Serve(lis); err != nil {
 			slog.Error("ошибка запуска сервера", "error", err)
+			return
 		}
 	}()
 

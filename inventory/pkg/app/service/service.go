@@ -115,20 +115,15 @@ func (s *InventoryServer) GetPart(
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "неверный формат uuid: %s", req.GetUuid())
 	}
-	if part, ok := s.parts[parsedUuid]; ok {
-		return &inventoryv1.GetPartResponse{
-			Part: &inventoryv1.Part{
-				Uuid:          part.UUID,
-				Name:          part.Name,
-				Description:   part.Description,
-				Price:         part.Price,
-				PartType:      part.PartType,
-				StockQuantity: part.StockQuantity,
-				CreatedAt:     part.CreatedAt,
-			},
-		}, nil
+	var part Part
+	part, ok := s.parts[parsedUuid]
+	if !ok {
+		return nil, status.Error(codes.NotFound, "деталь не найдена")
 	}
-	return nil, status.Error(codes.NotFound, "деталь не найдена")
+
+	return &inventoryv1.GetPartResponse{
+		Part: s.modelToProto(part),
+	}, nil
 }
 
 // ListParts возвращает список деталей с опциональной фильтрацией по типу
@@ -137,58 +132,32 @@ func (s *InventoryServer) ListParts(
 	req *inventoryv1.ListPartsRequest,
 ) (*inventoryv1.ListPartsResponse, error) {
 	parts := make([]*inventoryv1.Part, 0, len(s.parts))
+
 	if len(req.GetUuids()) > 0 {
-		var parts []*inventoryv1.Part
 		for _, uuidStr := range req.GetUuids() {
 			parsedUuid, err := uuid.Parse(uuidStr)
 			if err != nil {
 				return nil, status.Errorf(codes.InvalidArgument, "неверный формат uuid: %s", uuidStr)
 			}
-			if part, ok := s.parts[parsedUuid]; ok {
-				parts = append(parts, s.modelToProto(part))
-			} else {
+			part, ok := s.parts[parsedUuid]
+			if !ok {
 				return nil, status.Errorf(codes.NotFound, "деталь не найдена по uuid: %s", uuidStr)
 			}
-		}
-
-		return &inventoryv1.ListPartsResponse{
-			Parts: parts,
-		}, nil
-	}
-
-	if req.GetPartType() == inventoryv1.PartType_PART_TYPE_UNSPECIFIED {
-		for _, part := range s.parts {
 			parts = append(parts, s.modelToProto(part))
+		}
+	} else {
+		for _, part := range s.parts {
+			if req.GetPartType() == inventoryv1.PartType_PART_TYPE_UNSPECIFIED ||
+				req.GetPartType() == part.PartType {
+				parts = append(parts, s.modelToProto(part))
+			}
 		}
 		slices.SortFunc(parts, func(a, b *inventoryv1.Part) int {
 			return strings.Compare(a.Name, b.Name)
 		})
-		return &inventoryv1.ListPartsResponse{
-			Parts: parts,
-		}, nil
 	}
 
-	for _, part := range s.parts {
-		if part.PartType == req.GetPartType() {
-			parts = append(parts, s.modelToProto(part))
-		}
-	}
-	slices.SortFunc(parts, func(a, b *inventoryv1.Part) int {
-		return strings.Compare(a.Name, b.Name)
-	})
 	return &inventoryv1.ListPartsResponse{
 		Parts: parts,
 	}, nil
-}
-
-func (s *InventoryServer) modelToProto(part Part) *inventoryv1.Part {
-	return &inventoryv1.Part{
-		Uuid:          part.UUID,
-		Name:          part.Name,
-		Description:   part.Description,
-		Price:         part.Price,
-		PartType:      part.PartType,
-		StockQuantity: part.StockQuantity,
-		CreatedAt:     part.CreatedAt,
-	}
 }

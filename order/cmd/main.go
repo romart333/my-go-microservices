@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,7 +33,6 @@ const (
 const (
 	httpPort = "8080"
 
-	// Таймауты для HTTP-сервера.
 	readHeaderTimeout = 5 * time.Second
 	readTimeout       = 15 * time.Second
 	writeTimeout      = 15 * time.Second
@@ -53,7 +53,11 @@ func main() {
 		slog.Error("не удалось подключиться к InventoryService", "error", err)
 		return
 	}
-	defer inventoryConn.Close()
+	defer func() {
+		if err := inventoryConn.Close(); err != nil {
+			slog.Error("ошибка закрытия соединения с inventory service", "error", err)
+		}
+	}()
 
 	paymentConn, err := grpc.NewClient(paymentServiceAddress,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -66,7 +70,11 @@ func main() {
 		slog.Error("не удалось подключиться к PaymentService", "error", err)
 		return
 	}
-	defer paymentConn.Close()
+	defer func() {
+		if err := paymentConn.Close(); err != nil {
+			slog.Error("ошибка закрытия соединения с payment service", "error", err)
+		}
+	}()
 
 	// Создаём хранилище и обработчик
 	store := orderHandler.NewOrderStore()
@@ -84,7 +92,7 @@ func main() {
 	}
 
 	orderServer := &http.Server{
-		Addr:              ":" + httpPort,
+		Addr:              net.JoinHostPort(":", httpPort),
 		Handler:           router,
 		ReadHeaderTimeout: readHeaderTimeout,
 		ReadTimeout:       readTimeout,
@@ -96,6 +104,7 @@ func main() {
 		slog.Info("запуск OrderService", "port", httpPort)
 		if err := orderServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			slog.Error("ошибка запуска сервера", "error", err)
+			return
 		}
 	}()
 

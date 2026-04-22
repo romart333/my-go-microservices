@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"sync"
@@ -24,6 +23,26 @@ const (
 	grpcCallTimeout   = 5 * time.Second
 )
 
+const (
+	OrderStatusPENDINGPAYMENT OrderStatus = "PENDING_PAYMENT"
+	OrderStatusPAID           OrderStatus = "PAID"
+	OrderStatusCANCELLED      OrderStatus = "CANCELLED"
+)
+
+// OrderHandler реализует интерфейс orderv1.Handler, сгенерированный ogen.
+type OrderHandler struct {
+	orderv1.UnimplementedHandler
+	inventoryClient inventoryv1.InventoryServiceClient
+	paymentClient   paymentv1.PaymentServiceClient
+	store           *OrderStore
+}
+
+// OrderStore — хранилище заказов (in-memory).
+type OrderStore struct {
+	mu     sync.RWMutex
+	orders map[uuid.UUID]Order
+}
+
 // Order представляет заказ на постройку космического корабля.
 type Order struct {
 	OrderUUID       uuid.UUID
@@ -40,31 +59,11 @@ type Order struct {
 
 type OrderStatus string
 
-const (
-	OrderStatusPENDINGPAYMENT OrderStatus = "PENDING_PAYMENT"
-	OrderStatusPAID           OrderStatus = "PAID"
-	OrderStatusCANCELLED      OrderStatus = "CANCELLED"
-)
-
-// OrderStore — хранилище заказов (in-memory).
-type OrderStore struct {
-	mu     sync.RWMutex
-	orders map[uuid.UUID]Order
-}
-
 // NewOrderStore создаёт новое пустое хранилище заказов.
 func NewOrderStore() *OrderStore {
 	return &OrderStore{
 		orders: make(map[uuid.UUID]Order),
 	}
-}
-
-// OrderHandler реализует интерфейс orderv1.Handler, сгенерированный ogen.
-type OrderHandler struct {
-	orderv1.UnimplementedHandler
-	inventoryClient inventoryv1.InventoryServiceClient
-	paymentClient   paymentv1.PaymentServiceClient
-	store           *OrderStore
 }
 
 // NewOrderHandler создаёт новый обработчик заказов.
@@ -265,7 +264,7 @@ func (h *OrderHandler) PayOrder(ctx context.Context, req *orderv1.PayOrderReques
 	if order.Status == OrderStatusPAID {
 		return &orderv1.PayOrderConflict{
 			Code:    http.StatusConflict,
-			Message: "Заказ уже оплачен и не может быть отменён",
+			Message: "Заказ уже оплачен",
 		}, nil
 	}
 
@@ -335,6 +334,7 @@ func (h *OrderHandler) CancelOrder(ctx context.Context, params orderv1.CancelOrd
 			Message: "order_uuid обязательное поле",
 		}, nil
 	}
+
 	parsedUUID, err := uuid.Parse(params.OrderUUID.String())
 	if err != nil {
 		return &orderv1.CancelOrderBadRequest{
@@ -342,6 +342,7 @@ func (h *OrderHandler) CancelOrder(ctx context.Context, params orderv1.CancelOrd
 			Message: "order_uuid неверный UUID",
 		}, nil
 	}
+
 	h.store.mu.RLock()
 	order, ok := h.store.orders[parsedUUID]
 	h.store.mu.RUnlock()
@@ -351,6 +352,7 @@ func (h *OrderHandler) CancelOrder(ctx context.Context, params orderv1.CancelOrd
 			Message: "заказ не найден",
 		}, nil
 	}
+
 	switch order.Status {
 	case OrderStatusPENDINGPAYMENT:
 		order.Status = OrderStatusCANCELLED
@@ -369,6 +371,7 @@ func (h *OrderHandler) CancelOrder(ctx context.Context, params orderv1.CancelOrd
 			Message: "Заказ уже отменён",
 		}, nil
 	}
+
 	return &orderv1.CancelOrderBadRequest{
 		Code:    http.StatusBadRequest,
 		Message: "неизвестный статус заказа",
@@ -380,19 +383,4 @@ func (h *OrderHandler) optNilUUIDToString(o orderv1.OptNilUUID) string {
 		return v.String()
 	}
 	return uuid.Nil.String()
-}
-
-func (h *OrderHandler) paymentMethodToProto(o orderv1.PaymentMethod) (paymentv1.PaymentMethod, error) {
-	paymentMethodMap := map[orderv1.PaymentMethod]paymentv1.PaymentMethod{
-		orderv1.PaymentMethodCARD:          paymentv1.PaymentMethod_PAYMENT_METHOD_CARD,
-		orderv1.PaymentMethodSBP:           paymentv1.PaymentMethod_PAYMENT_METHOD_SBP,
-		orderv1.PaymentMethodCREDITCARD:    paymentv1.PaymentMethod_PAYMENT_METHOD_CREDIT_CARD,
-		orderv1.PaymentMethodINVESTORMONEY: paymentv1.PaymentMethod_PAYMENT_METHOD_INVESTOR_MONEY,
-	}
-	protoPaymentMethod, ok := paymentMethodMap[o]
-	if !ok {
-		return protoPaymentMethod, errors.New("неверный payment_method")
-	}
-
-	return protoPaymentMethod, nil
 }
