@@ -99,25 +99,25 @@ func main() {
 		WriteTimeout:      writeTimeout,
 		IdleTimeout:       idleTimeout,
 	}
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+	defer cancel()
 
 	go func() {
 		slog.Info("запуск OrderService", "port", httpPort)
 		if err := orderServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			slog.Error("ошибка запуска сервера", "error", err)
-			return
+			cancel()
 		}
 	}()
 
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
-	<-quit
+	<-ctx.Done()
+	slog.Info("завершаем работу OrderService ")
 
-	slog.Info("получен сигнал остановки, завершаем работу")
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	defer shutdownCancel()
 
-	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
-	defer cancel()
-	if err := orderServer.Shutdown(ctx); err != nil {
-		slog.Error("ошибка завершения работы сервера", "error", err)
+	if err := orderServer.Shutdown(shutdownCtx); err != nil {
+		slog.Error("ошибка завершения работы OrderService", "error", err)
 	}
 	slog.Info("OrderService завершен")
 }

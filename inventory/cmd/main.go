@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"net"
 	"os"
@@ -54,18 +55,21 @@ func main() {
 	// Включаем reflection для postman/grpcurl
 	reflection.Register(grpcServer)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	go func() {
 		slog.Info("запуск InventoryService", "адрес", grpcAddress)
 		if err := grpcServer.Serve(lis); err != nil {
-			slog.Error("ошибка запуска сервера", "error", err)
-			return
+			slog.Error("ошибка запуска InventoryService", "error", err)
+			cancel()
 		}
 	}()
 
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
-	<-stop
-	slog.Info("получен сигнал остановки, завершаем работу")
+	<-ctx.Done()
+
+	slog.Info("остановка InventoryService")
+
 	grpcServer.GracefulStop()
-	slog.Info("grpc server остановлен")
+	slog.Info("InventoryService остановлен")
 }

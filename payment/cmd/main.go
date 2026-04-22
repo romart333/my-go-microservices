@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"net"
 	"os"
@@ -53,18 +54,19 @@ func main() {
 	// Включаем reflection для postman/grpcurl
 	reflection.Register(grpcServer)
 
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+	defer cancel()
+
 	go func() {
 		slog.Info("запуск PaymentService", "адрес", grpcAddress)
 		if err := grpcServer.Serve(lis); err != nil {
 			slog.Error("ошибка запуска сервера", "error", err)
-			return
+			cancel()
 		}
 	}()
 
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
-	<-stop
-	slog.Info("получен сигнал остановки, завершаем работу")
+	<-ctx.Done()
+	slog.Info("завершаем работу PaymentService")
 	grpcServer.GracefulStop()
-	slog.Info("grpc server остановлен")
+	slog.Info("PaymentService остановлен")
 }
