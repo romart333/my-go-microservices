@@ -34,3 +34,6 @@ docs/.vitepress/dist
 docs/.vitepress/cache
 .playwright-mcp/
 *__pycache__/
+
+# Debug binaries
+__debug_bin*
