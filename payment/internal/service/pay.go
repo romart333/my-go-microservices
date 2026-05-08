@@ -7,10 +7,10 @@ import (
 	"github.com/google/uuid"
 
 	errs "github.com/romart333/my-go-microservices/payment/internal/errors"
-	"github.com/romart333/my-go-microservices/payment/internal/model"
+	"github.com/romart333/my-go-microservices/payment/internal/input"
 )
 
-func (s *PaymentService) Pay(ctx context.Context, req model.PayRequest) (string, error) {
+func (s *PaymentService) Pay(ctx context.Context, req input.PayOrderInput) (string, error) {
 	if req.OrderUUID == "" {
 		return "", errs.ErrInvalidOrderUUID
 	}

@@ -10,7 +10,7 @@ import (
 
 	"github.com/romart333/my-go-microservices/inventory/internal/converter"
 	errs "github.com/romart333/my-go-microservices/inventory/internal/errors"
-	"github.com/romart333/my-go-microservices/inventory/internal/model"
+	"github.com/romart333/my-go-microservices/inventory/internal/service/input"
 	inventoryv1 "github.com/romart333/my-go-microservices/shared/pkg/proto/inventory/v1"
 )
 
@@ -19,7 +19,7 @@ func (s *InventoryServer) ListParts(
 	ctx context.Context,
 	req *inventoryv1.ListPartsRequest,
 ) (*inventoryv1.ListPartsResponse, error) {
-	filter := model.PartFilter{
+	filter := input.PartFilter{
 		PartType: converter.PartTypeToModel(req.GetPartType()),
 		UUIDs:    req.GetUuids(),
 	}

@@ -8,7 +8,7 @@ import (
 	"github.com/romart333/my-go-microservices/order/internal/repository/converter"
 )
 
-func (s *OrderStore) Update(ctx context.Context, order model.Order) error {
+func (s *OrderStore) Update(_ context.Context, order model.Order) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

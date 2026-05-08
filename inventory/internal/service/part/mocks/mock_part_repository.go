@@ -11,6 +11,7 @@ import (
 	"context"
 
 	"github.com/romart333/my-go-microservices/inventory/internal/model"
+	"github.com/romart333/my-go-microservices/inventory/internal/service/input"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -108,7 +109,7 @@ func (_c *PartRepository_Get_Call) RunAndReturn(run func(ctx context.Context, id
 }
 
 // List provides a mock function for the type PartRepository
-func (_mock *PartRepository) List(ctx context.Context, filter model.PartFilter) ([]model.Part, error) {
+func (_mock *PartRepository) List(ctx context.Context, filter input.PartFilter) ([]model.Part, error) {
 	ret := _mock.Called(ctx, filter)
 
 	if len(ret) == 0 {
@@ -117,17 +118,17 @@ func (_mock *PartRepository) List(ctx context.Context, filter model.PartFilter) 
 
 	var r0 []model.Part
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, model.PartFilter) ([]model.Part, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, input.PartFilter) ([]model.Part, error)); ok {
 		return returnFunc(ctx, filter)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, model.PartFilter) []model.Part); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, input.PartFilter) []model.Part); ok {
 		r0 = returnFunc(ctx, filter)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]model.Part)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, model.PartFilter) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, input.PartFilter) error); ok {
 		r1 = returnFunc(ctx, filter)
 	} else {
 		r1 = ret.Error(1)
@@ -142,20 +143,20 @@ type PartRepository_List_Call struct {
 
 // List is a helper method to define mock.On call
 //   - ctx context.Context
-//   - filter model.PartFilter
+//   - filter input.PartFilter
 func (_e *PartRepository_Expecter) List(ctx interface{}, filter interface{}) *PartRepository_List_Call {
 	return &PartRepository_List_Call{Call: _e.mock.On("List", ctx, filter)}
 }
 
-func (_c *PartRepository_List_Call) Run(run func(ctx context.Context, filter model.PartFilter)) *PartRepository_List_Call {
+func (_c *PartRepository_List_Call) Run(run func(ctx context.Context, filter input.PartFilter)) *PartRepository_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 model.PartFilter
+		var arg1 input.PartFilter
 		if args[1] != nil {
-			arg1 = args[1].(model.PartFilter)
+			arg1 = args[1].(input.PartFilter)
 		}
 		run(
 			arg0,
@@ -170,7 +171,7 @@ func (_c *PartRepository_List_Call) Return(parts []model.Part, err error) *PartR
 	return _c
 }
 
-func (_c *PartRepository_List_Call) RunAndReturn(run func(ctx context.Context, filter model.PartFilter) ([]model.Part, error)) *PartRepository_List_Call {
+func (_c *PartRepository_List_Call) RunAndReturn(run func(ctx context.Context, filter input.PartFilter) ([]model.Part, error)) *PartRepository_List_Call {
 	_c.Call.Return(run)
 	return _c
 }

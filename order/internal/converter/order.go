@@ -7,11 +7,12 @@ import (
 
 	errs "github.com/romart333/my-go-microservices/order/internal/errors"
 	"github.com/romart333/my-go-microservices/order/internal/model"
+	"github.com/romart333/my-go-microservices/order/internal/service/input"
 	orderv1 "github.com/romart333/my-go-microservices/shared/pkg/openapi/order/v1"
 )
 
-func CreateOrderRequestToModel(req *orderv1.CreateOrderRequest) model.CreateOrderRequest {
-	result := model.CreateOrderRequest{
+func CreateOrderRequestToModel(req *orderv1.CreateOrderRequest) input.CreateOrderInput {
+	result := input.CreateOrderInput{
 		HullUUID:   req.GetHullUUID().String(),
 		EngineUUID: req.GetEngineUUID().String(),
 	}

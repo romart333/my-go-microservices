@@ -9,9 +9,10 @@ import (
 
 	errs "github.com/romart333/my-go-microservices/order/internal/errors"
 	"github.com/romart333/my-go-microservices/order/internal/model"
+	"github.com/romart333/my-go-microservices/order/internal/service/input"
 )
 
-func (s *OrderService) Create(ctx context.Context, req model.CreateOrderRequest) (model.Order, error) {
+func (s *OrderService) Create(ctx context.Context, req input.CreateOrderInput) (model.Order, error) {
 	if req.HullUUID == "" {
 		return model.Order{}, errs.ErrHullIsRequired
 	}
@@ -45,7 +46,7 @@ func (s *OrderService) Create(ctx context.Context, req model.CreateOrderRequest)
 		ShieldUUID: req.ShieldUUID,
 		WeaponUUID: req.WeaponUUID,
 	}
-	createErr := s.orderRepository.CreateOrder(order)
+	createErr := s.orderRepository.Create(ctx, order)
 	if createErr != nil {
 		return model.Order{}, fmt.Errorf("создать заказ: %w", createErr)
 	}

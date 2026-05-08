@@ -8,7 +8,7 @@ import (
 	"github.com/romart333/my-go-microservices/order/internal/repository/converter"
 )
 
-func (s *OrderStore) Get(ctx context.Context, uuid string) (model.Order, error) {
+func (s *OrderStore) Get(_ context.Context, uuid string) (model.Order, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 

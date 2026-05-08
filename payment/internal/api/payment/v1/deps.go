@@ -3,9 +3,9 @@ package v1
 import (
 	"context"
 
-	"github.com/romart333/my-go-microservices/payment/internal/model"
+	"github.com/romart333/my-go-microservices/payment/internal/input"
 )
 
 type PaymentService interface {
-	Pay(ctx context.Context, req model.PayRequest) (string, error)
+	Pay(ctx context.Context, req input.PayOrderInput) (string, error)
 }

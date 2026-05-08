@@ -53,21 +53,3 @@ func (o PaymentMethod) IsValid() bool {
 
 	return false
 }
-
-type CreateOrderRequest struct {
-	HullUUID   string
-	EngineUUID string
-	ShieldUUID *string
-	WeaponUUID *string
-}
-
-func (r *CreateOrderRequest) PartUUIDs() []string {
-	uuids := []string{r.HullUUID, r.EngineUUID}
-	if r.ShieldUUID != nil {
-		uuids = append(uuids, *r.ShieldUUID)
-	}
-	if r.WeaponUUID != nil {
-		uuids = append(uuids, *r.WeaponUUID)
-	}
-	return uuids
-}

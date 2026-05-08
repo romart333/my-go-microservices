@@ -1,12 +1,13 @@
 package converter
 
 import (
+	"github.com/romart333/my-go-microservices/payment/internal/input"
 	"github.com/romart333/my-go-microservices/payment/internal/model"
 	paymentv1 "github.com/romart333/my-go-microservices/shared/pkg/proto/payment/v1"
 )
 
-func PayRequestToModel(req *paymentv1.PayOrderRequest) model.PayRequest {
-	return model.PayRequest{
+func PayRequestToInput(req *paymentv1.PayOrderRequest) input.PayOrderInput {
+	return input.PayOrderInput{
 		OrderUUID:     req.GetOrderUuid(),
 		PaymentMethod: PaymentMethodToModel(req.GetPaymentMethod()),
 	}

@@ -1,11 +1,13 @@
 package order
 
 import (
+	"context"
+
 	"github.com/romart333/my-go-microservices/order/internal/model"
 	"github.com/romart333/my-go-microservices/order/internal/repository/converter"
 )
 
-func (s *OrderStore) CreateOrder(order model.Order) error {
+func (s *OrderStore) Create(_ context.Context, order model.Order) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

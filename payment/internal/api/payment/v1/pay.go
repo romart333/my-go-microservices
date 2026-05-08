@@ -17,7 +17,7 @@ func (s *PaymentServer) PayOrder(
 	ctx context.Context,
 	req *paymentv1.PayOrderRequest,
 ) (*paymentv1.PayOrderResponse, error) {
-	model := converter.PayRequestToModel(req)
+	model := converter.PayRequestToInput(req)
 	transactionUUID, err := s.paymentService.Pay(ctx, model)
 	if err != nil {
 		if errors.Is(err, errs.ErrInvalidOrderUUID) {

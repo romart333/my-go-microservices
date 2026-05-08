@@ -8,9 +8,10 @@ import (
 
 	errs "github.com/romart333/my-go-microservices/inventory/internal/errors"
 	"github.com/romart333/my-go-microservices/inventory/internal/model"
+	"github.com/romart333/my-go-microservices/inventory/internal/service/input"
 )
 
-func (s *PartService) List(ctx context.Context, filter model.PartFilter) ([]model.Part, error) {
+func (s *PartService) List(ctx context.Context, filter input.PartFilter) ([]model.Part, error) {
 	for _, id := range filter.UUIDs {
 		if id == "" {
 			return nil, errs.ErrInvalidUUID

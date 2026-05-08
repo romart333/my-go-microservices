@@ -10,7 +10,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/romart333/my-go-microservices/payment/internal/model"
+	"github.com/romart333/my-go-microservices/payment/internal/input"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -42,7 +42,7 @@ func (_m *PaymentService) EXPECT() *PaymentService_Expecter {
 }
 
 // Pay provides a mock function for the type PaymentService
-func (_mock *PaymentService) Pay(ctx context.Context, req model.PayRequest) (string, error) {
+func (_mock *PaymentService) Pay(ctx context.Context, req input.PayOrderInput) (string, error) {
 	ret := _mock.Called(ctx, req)
 
 	if len(ret) == 0 {
@@ -51,15 +51,15 @@ func (_mock *PaymentService) Pay(ctx context.Context, req model.PayRequest) (str
 
 	var r0 string
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, model.PayRequest) (string, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, input.PayOrderInput) (string, error)); ok {
 		return returnFunc(ctx, req)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, model.PayRequest) string); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, input.PayOrderInput) string); ok {
 		r0 = returnFunc(ctx, req)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, model.PayRequest) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, input.PayOrderInput) error); ok {
 		r1 = returnFunc(ctx, req)
 	} else {
 		r1 = ret.Error(1)
@@ -74,20 +74,20 @@ type PaymentService_Pay_Call struct {
 
 // Pay is a helper method to define mock.On call
 //   - ctx context.Context
-//   - req model.PayRequest
+//   - req input.PayOrderInput
 func (_e *PaymentService_Expecter) Pay(ctx interface{}, req interface{}) *PaymentService_Pay_Call {
 	return &PaymentService_Pay_Call{Call: _e.mock.On("Pay", ctx, req)}
 }
 
-func (_c *PaymentService_Pay_Call) Run(run func(ctx context.Context, req model.PayRequest)) *PaymentService_Pay_Call {
+func (_c *PaymentService_Pay_Call) Run(run func(ctx context.Context, req input.PayOrderInput)) *PaymentService_Pay_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 model.PayRequest
+		var arg1 input.PayOrderInput
 		if args[1] != nil {
-			arg1 = args[1].(model.PayRequest)
+			arg1 = args[1].(input.PayOrderInput)
 		}
 		run(
 			arg0,
@@ -102,7 +102,7 @@ func (_c *PaymentService_Pay_Call) Return(s string, err error) *PaymentService_P
 	return _c
 }
 
-func (_c *PaymentService_Pay_Call) RunAndReturn(run func(ctx context.Context, req model.PayRequest) (string, error)) *PaymentService_Pay_Call {
+func (_c *PaymentService_Pay_Call) RunAndReturn(run func(ctx context.Context, req input.PayOrderInput) (string, error)) *PaymentService_Pay_Call {
 	_c.Call.Return(run)
 	return _c
 }
