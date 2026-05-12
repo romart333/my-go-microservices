@@ -88,6 +88,11 @@ tasks:
       - echo '📦 Сортируем импорты через gci...'
       - find . -type f -name '*.go' ! -path '*/mocks/*' ! -path '*/pkg/proto/*' ! -path '*/pkg/openapi/*' -exec {{.GCI}} write -s standard -s default -s "prefix(github.com/romart333/my-go-microservices)" {} +
 
+  build:
+    desc: "Собирает все Go-модули (go build)"
+    cmds:
+      - go build ./order/... ./inventory/... ./payment/...
+      
   lint:
     desc: "Запускает golangci-lint"
     deps: [golangci-lint:install]
@@ -225,3 +230,12 @@ tasks:
     desc: "Проверяет покрытие без запуска тестов"
     cmds:
       - task: coverage:threshold
+
+  coverage:badge:update:
+    desc: "Обновляет coverage badge gist по coverage.out"
+    cmds:
+      - ./scripts/update-coverage-badge.sh
+
+  coverage:badge:
+    desc: "Запускает coverage и обновляет badge gist"
+    deps: [test:coverage, coverage:badge:update]
