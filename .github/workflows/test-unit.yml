@@ -35,7 +35,8 @@ jobs:
         run: task test:coverage
 
       - name: Update coverage badge gist
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.GIST_TOKEN != '' && secrets.COVERAGE_GIST_ID != ''
+      # временно убрал завязку на main
+        if: github.event_name == 'push' && secrets.GIST_TOKEN != '' && secrets.COVERAGE_GIST_ID != ''
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           COVERAGE_GIST_ID: ${{ secrets.COVERAGE_GIST_ID }}
