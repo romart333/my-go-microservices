@@ -2,7 +2,6 @@ name: "CI"
 
 on:
   push:
-    branches: [main]
   pull_request:
     branches: [main]
 
@@ -29,4 +28,6 @@ jobs:
     name: "Test Unit"
     needs: build
     uses: ./.github/workflows/test-unit.yml
+    with:
+      update_badge: ${{ github.event_name == 'push' }}
     secrets: inherit

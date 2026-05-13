@@ -2,6 +2,11 @@ name: "Test Unit"
 
 on:
   workflow_call:
+    inputs:
+      update_badge:
+        required: false
+        type: boolean
+        default: false
     secrets:
       GIST_TOKEN:
         required: false
@@ -35,7 +40,7 @@ jobs:
         run: task test:coverage
 
       - name: Update coverage badge gist
-        if: github.event_name == 'push'
+        if: inputs.update_badge
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           COVERAGE_GIST_ID: ${{ secrets.COVERAGE_GIST_ID }}
