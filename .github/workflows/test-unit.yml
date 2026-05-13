@@ -35,12 +35,16 @@ jobs:
         run: task test:coverage
 
       - name: Update coverage badge gist
-      # временно убрал завязку на main
-        if: github.event_name == 'push' && secrets.GIST_TOKEN != '' && secrets.COVERAGE_GIST_ID != ''
+        if: github.event_name == 'push'
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           COVERAGE_GIST_ID: ${{ secrets.COVERAGE_GIST_ID }}
-        run: task coverage:badge:update
+        run: |
+          if [[ -z "${GIST_TOKEN:-}" || -z "${COVERAGE_GIST_ID:-}" ]]; then
+            echo "Skip badge update: GIST_TOKEN or COVERAGE_GIST_ID is missing"
+            exit 0
+          fi
+          task coverage:badge:update
 
       - name: Publish coverage to job summary
         if: always()
