@@ -29,5 +29,5 @@ jobs:
     needs: build
     uses: ./.github/workflows/test-unit.yml
     with:
-      update_badge: ${{ github.event_name == 'push' }}
+      update_badge: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     secrets: inherit
