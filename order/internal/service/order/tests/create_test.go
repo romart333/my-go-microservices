@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -29,8 +30,8 @@ func TestCreate(t *testing.T) {
 	var (
 		ctx = context.Background()
 
-		hullUUID   = gofakeit.UUID()
-		engineUUID = gofakeit.UUID()
+		hullUUID   = uuid.MustParse(gofakeit.UUID())
+		engineUUID = uuid.MustParse(gofakeit.UUID())
 
 		partsInStock = []model.Part{
 			{UUID: hullUUID, Name: "Hull", Price: 500000, StockQuantity: 10},
@@ -59,15 +60,16 @@ func TestCreate(t *testing.T) {
 			},
 			setupMock: func(repo *mocks.OrderRepository, client *mocks.InventoryClient) {
 				client.EXPECT().
-					ListParts(ctx, []string{hullUUID, engineUUID}).
+					ListParts(ctx, uuid.UUIDs{hullUUID, engineUUID}).
 					Return(partsInStock, nil)
 
 				repo.EXPECT().
 					Create(ctx, mock.MatchedBy(func(o model.Order) bool {
-						return o.HullUUID == hullUUID &&
-							o.EngineUUID == engineUUID &&
-							o.TotalPrice == 800000 && // 500000 + 300000
-							o.Status == model.OrderStatusPENDINGPAYMENT
+						return len(o.Items) == 2 &&
+							o.Items[0].PartUUID == hullUUID &&
+							o.Items[1].PartUUID == engineUUID &&
+							o.TotalPrice() == 800000 && // 500000 + 300000
+							o.Status == model.OrderStatusPendingPayment
 					})).
 					Return(nil)
 			},
@@ -83,7 +85,7 @@ func TestCreate(t *testing.T) {
 			},
 			setupMock: func(repo *mocks.OrderRepository, client *mocks.InventoryClient) {
 				client.EXPECT().
-					ListParts(ctx, []string{hullUUID, engineUUID}).
+					ListParts(ctx, uuid.UUIDs{hullUUID, engineUUID}).
 					Return(nil, errs.ErrPartNotFound)
 			},
 			expected: expected{err: errs.ErrPartNotFound},
@@ -98,7 +100,7 @@ func TestCreate(t *testing.T) {
 			},
 			setupMock: func(repo *mocks.OrderRepository, client *mocks.InventoryClient) {
 				client.EXPECT().
-					ListParts(ctx, []string{hullUUID, engineUUID}).
+					ListParts(ctx, uuid.UUIDs{hullUUID, engineUUID}).
 					Return(partsOutOfStock, nil)
 			},
 			expected: expected{err: errs.ErrOutOfStock},

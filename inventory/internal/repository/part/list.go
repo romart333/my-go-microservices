@@ -12,7 +12,7 @@ import (
 	"github.com/romart333/my-go-microservices/inventory/internal/service/input"
 )
 
-func (r *PartRepository) List(ctx context.Context, filter input.PartFilter) ([]model.Part, error) {
+func (r *repository) List(ctx context.Context, filter input.PartFilter) ([]model.Part, error) {
 	r.RLock()
 	defer r.RUnlock()
 	parts := make([]model.Part, 0, len(r.parts))

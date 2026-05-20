@@ -1,0 +1,7 @@
+description: |
+  Ответ при ошибке. HTTP-код передаётся в статус-строке,
+  тело — единая схема Error.
+content:
+  application/json:
+    schema:
+      $ref: '../errors/error.yaml'

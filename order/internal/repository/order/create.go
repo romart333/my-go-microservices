@@ -7,7 +7,7 @@ import (
 	"github.com/romart333/my-go-microservices/order/internal/repository/converter"
 )
 
-func (s *OrderStore) Create(_ context.Context, order model.Order) error {
+func (s *repository) Create(_ context.Context, order model.Order) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

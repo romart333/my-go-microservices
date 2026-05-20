@@ -5,7 +5,7 @@ import (
 
 	api "github.com/romart333/my-go-microservices/payment/internal/api/payment/v1"
 	"github.com/romart333/my-go-microservices/payment/internal/interceptor"
-	service "github.com/romart333/my-go-microservices/payment/internal/service"
+	service "github.com/romart333/my-go-microservices/payment/internal/service/payment"
 	paymentv1 "github.com/romart333/my-go-microservices/shared/pkg/proto/payment/v1"
 )
 
@@ -17,6 +17,6 @@ func RegisterServices(grpcServer *grpc.Server) {
 
 func Interceptors() []grpc.ServerOption {
 	return []grpc.ServerOption{
-		grpc.UnaryInterceptor(interceptor.LoggerInterceptor),
+		grpc.UnaryInterceptor(interceptor.ErrorInterceptor),
 	}
 }

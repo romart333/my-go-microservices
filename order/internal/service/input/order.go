@@ -1,19 +1,21 @@
 package input
 
+import "github.com/google/uuid"
+
 type CreateOrderInput struct {
-	HullUUID   string
-	EngineUUID string
-	ShieldUUID *string
-	WeaponUUID *string
+	HullUUID   uuid.UUID
+	EngineUUID uuid.UUID
+	ShieldUUID *uuid.UUID
+	WeaponUUID *uuid.UUID
 }
 
-func (r *CreateOrderInput) PartUUIDs() []string {
-	uuids := []string{r.HullUUID, r.EngineUUID}
-	if r.ShieldUUID != nil {
-		uuids = append(uuids, *r.ShieldUUID)
+func (i *CreateOrderInput) PartUUIDs() uuid.UUIDs {
+	uuids := uuid.UUIDs{i.HullUUID, i.EngineUUID}
+	if i.ShieldUUID != nil {
+		uuids = append(uuids, *i.ShieldUUID)
 	}
-	if r.WeaponUUID != nil {
-		uuids = append(uuids, *r.WeaponUUID)
+	if i.WeaponUUID != nil {
+		uuids = append(uuids, *i.WeaponUUID)
 	}
 	return uuids
 }

@@ -51,6 +51,8 @@ func partTypeToRecord(p model.PartType) string {
 		return "ENGINE"
 	case model.PartTypeShield:
 		return "SHIELD"
+	case model.PartTypeWeapon:
+		return "WEAPON"
 	}
 	return "UNSPECIFIED"
 }

@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
 	errs "github.com/romart333/my-go-microservices/payment/internal/errors"
-	"github.com/romart333/my-go-microservices/payment/internal/input"
-	"github.com/romart333/my-go-microservices/payment/internal/model"
-	"github.com/romart333/my-go-microservices/payment/internal/service"
+	model "github.com/romart333/my-go-microservices/payment/internal/model"
+	input "github.com/romart333/my-go-microservices/payment/internal/service/input"
+	service "github.com/romart333/my-go-microservices/payment/internal/service/payment"
 )
 
 func TestPay(t *testing.T) {
@@ -26,7 +27,7 @@ func TestPay(t *testing.T) {
 
 	var (
 		ctx       = context.Background()
-		orderUUID = gofakeit.UUID()
+		orderUUID = uuid.MustParse(gofakeit.UUID())
 	)
 
 	tests := []struct {
@@ -50,18 +51,6 @@ func TestPay(t *testing.T) {
 					OrderUUID:     orderUUID,
 					PaymentMethod: model.PaymentMethodSBP,
 				},
-			},
-		},
-		{
-			name: "пустой order_uuid",
-			args: args{
-				input: input.PayOrderInput{
-					OrderUUID:     "invalid-uuid",
-					PaymentMethod: model.PaymentMethodSBP,
-				},
-			},
-			expected: expected{
-				err: errs.ErrInvalidOrderUUID,
 			},
 		},
 		{

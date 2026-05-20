@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	internalorderv1 "github.com/romart333/my-go-microservices/order/internal/api/order/v1"
+	api "github.com/romart333/my-go-microservices/order/internal/api/order/v1"
 	inventoryapi "github.com/romart333/my-go-microservices/order/internal/client/grpc/inventory/v1"
 	paymentapi "github.com/romart333/my-go-microservices/order/internal/client/grpc/payment/v1"
 	orderRepo "github.com/romart333/my-go-microservices/order/internal/repository/order"
@@ -21,18 +21,18 @@ const (
 	middlewareTimeout = 10 * time.Second
 )
 
-func registerServices(inventoryClient *inventoryv1.InventoryServiceClient, paymentClient *paymentv1.PaymentServiceClient) *internalorderv1.OrderHandler {
+func registerServices(inventoryClient *inventoryv1.InventoryServiceClient, paymentClient *paymentv1.PaymentServiceClient) *api.OrderHandler {
 	inventoryApiClient := inventoryapi.NewInventoryClient(*inventoryClient)
 	paymentApiClient := paymentapi.NewPaymentClient(*paymentClient)
 
-	repo := orderRepo.NewOrderStore()
+	repo := orderRepo.NewOrderRepository()
 	service := orderService.NewOrderService(inventoryApiClient, paymentApiClient, repo)
-	return internalorderv1.NewOrderHandler(service)
+	return api.NewOrderHandler(service)
 }
 
 func NewHTTPHandler(inventoryClient *inventoryv1.InventoryServiceClient, paymentClient *paymentv1.PaymentServiceClient) (*orderv1.Server, error) {
 	h := registerServices(inventoryClient, paymentClient)
-	server, err := orderv1.NewServer(h)
+	server, err := orderv1.NewServer(h, orderv1.WithErrorHandler(api.ErrorHandler))
 	if err != nil {
 		return nil, fmt.Errorf("ошибка создания сервера OpenAPI: %w", err)
 	}

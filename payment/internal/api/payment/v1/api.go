@@ -4,14 +4,13 @@ import (
 	paymentv1 "github.com/romart333/my-go-microservices/shared/pkg/proto/payment/v1"
 )
 
-// PaymentServer реализует gRPC сервис оплаты
-type PaymentServer struct {
+type server struct {
 	paymentv1.UnimplementedPaymentServiceServer
 	paymentService PaymentService
 }
 
-func NewPaymentServer(paymentService PaymentService) *PaymentServer {
-	return &PaymentServer{
+func NewPaymentServer(paymentService PaymentService) *server {
+	return &server{
 		paymentService: paymentService,
 	}
 }

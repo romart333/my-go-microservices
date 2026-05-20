@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	gofakeit "github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
 	errs "github.com/romart333/my-go-microservices/inventory/internal/errors"
@@ -17,7 +18,7 @@ func TestGet(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		uuid string
+		uuid uuid.UUID
 	}
 
 	type expected struct {
@@ -28,7 +29,7 @@ func TestGet(t *testing.T) {
 	var (
 		ctx = context.Background()
 
-		uuid = gofakeit.UUID()
+		uuid = uuid.MustParse(gofakeit.UUID())
 		part = model.Part{
 			UUID:          uuid,
 			Name:          gofakeit.Name(),
@@ -65,13 +66,6 @@ func TestGet(t *testing.T) {
 				repo.EXPECT().Get(ctx, uuid).Return(model.Part{}, errs.ErrPartNotFound)
 			},
 			expected: expected{err: errs.ErrPartNotFound, part: model.Part{}},
-		},
-		{
-			name: "неверный формат uuid",
-			args: args{
-				uuid: "invalid-uuid",
-			},
-			expected: expected{err: errs.ErrInvalidUUID, part: model.Part{}},
 		},
 	}
 	for _, tc := range tests {

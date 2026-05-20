@@ -10,6 +10,7 @@ package mocks
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/romart333/my-go-microservices/order/internal/model"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -42,7 +43,7 @@ func (_m *InventoryClient) EXPECT() *InventoryClient_Expecter {
 }
 
 // ListParts provides a mock function for the type InventoryClient
-func (_mock *InventoryClient) ListParts(ctx context.Context, uuids []string) ([]model.Part, error) {
+func (_mock *InventoryClient) ListParts(ctx context.Context, uuids uuid.UUIDs) ([]model.Part, error) {
 	ret := _mock.Called(ctx, uuids)
 
 	if len(ret) == 0 {
@@ -51,17 +52,17 @@ func (_mock *InventoryClient) ListParts(ctx context.Context, uuids []string) ([]
 
 	var r0 []model.Part
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, []string) ([]model.Part, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUIDs) ([]model.Part, error)); ok {
 		return returnFunc(ctx, uuids)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, []string) []model.Part); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUIDs) []model.Part); ok {
 		r0 = returnFunc(ctx, uuids)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]model.Part)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, []string) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUIDs) error); ok {
 		r1 = returnFunc(ctx, uuids)
 	} else {
 		r1 = ret.Error(1)
@@ -76,20 +77,20 @@ type InventoryClient_ListParts_Call struct {
 
 // ListParts is a helper method to define mock.On call
 //   - ctx context.Context
-//   - uuids []string
+//   - uuids uuid.UUIDs
 func (_e *InventoryClient_Expecter) ListParts(ctx interface{}, uuids interface{}) *InventoryClient_ListParts_Call {
 	return &InventoryClient_ListParts_Call{Call: _e.mock.On("ListParts", ctx, uuids)}
 }
 
-func (_c *InventoryClient_ListParts_Call) Run(run func(ctx context.Context, uuids []string)) *InventoryClient_ListParts_Call {
+func (_c *InventoryClient_ListParts_Call) Run(run func(ctx context.Context, uuids uuid.UUIDs)) *InventoryClient_ListParts_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 []string
+		var arg1 uuid.UUIDs
 		if args[1] != nil {
-			arg1 = args[1].([]string)
+			arg1 = args[1].(uuid.UUIDs)
 		}
 		run(
 			arg0,
@@ -104,7 +105,7 @@ func (_c *InventoryClient_ListParts_Call) Return(parts []model.Part, err error) 
 	return _c
 }
 
-func (_c *InventoryClient_ListParts_Call) RunAndReturn(run func(ctx context.Context, uuids []string) ([]model.Part, error)) *InventoryClient_ListParts_Call {
+func (_c *InventoryClient_ListParts_Call) RunAndReturn(run func(ctx context.Context, uuids uuid.UUIDs) ([]model.Part, error)) *InventoryClient_ListParts_Call {
 	_c.Call.Return(run)
 	return _c
 }

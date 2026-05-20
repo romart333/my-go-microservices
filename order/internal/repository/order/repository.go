@@ -3,18 +3,20 @@ package order
 import (
 	"sync"
 
+	"github.com/google/uuid"
+
 	"github.com/romart333/my-go-microservices/order/internal/repository/record"
 )
 
-// OrderStore — хранилище заказов (in-memory).
-type OrderStore struct {
+// repository — хранилище заказов (in-memory).
+type repository struct {
 	mu     sync.RWMutex
-	orders map[string]record.Order
+	orders map[uuid.UUID]record.Order
 }
 
-// NewOrderStore создаёт новое пустое хранилище заказов.
-func NewOrderStore() *OrderStore {
-	return &OrderStore{
-		orders: make(map[string]record.Order),
+// NewOrderRepository создаёт новое пустое хранилище заказов.
+func NewOrderRepository() *repository {
+	return &repository{
+		orders: make(map[uuid.UUID]record.Order),
 	}
 }

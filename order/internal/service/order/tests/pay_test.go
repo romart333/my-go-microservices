@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -20,27 +21,27 @@ func TestPay(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		orderUUID       string
+		orderUUID       uuid.UUID
 		method          model.PaymentMethod
-		transactionUUID string
+		transactionUUID uuid.UUID
 	}
 
 	type expected struct {
 		err             error
-		transactionUUID string
+		transactionUUID uuid.UUID
 	}
 
 	var (
 		ctx = context.Background()
 
-		orderUUID = gofakeit.UUID()
+		orderUUID = uuid.MustParse(gofakeit.UUID())
 		method    = model.PaymentMethod(gofakeit.RandomString([]string{
-			string(model.PaymentMethodCARD),
-			string(model.PaymentMethodSBP),
-			string(model.PaymentMethodCREDITCARD),
-			string(model.PaymentMethodINVESTORMONEY),
+			string(model.PaymentMethodCard),
+			string(model.PaymentMethodSbp),
+			string(model.PaymentMethodCreditCard),
+			string(model.PaymentMethodInvestorMoney),
 		}))
-		transactionUUID = gofakeit.UUID()
+		transactionUUID = uuid.MustParse(gofakeit.UUID())
 	)
 
 	tests := []struct {
@@ -60,7 +61,7 @@ func TestPay(t *testing.T) {
 			setupMock: func(repo *mocks.OrderRepository, paymentClient *mocks.PaymentClient) {
 				repo.EXPECT().Get(ctx, orderUUID).Return(model.Order{
 					UUID:            orderUUID,
-					Status:          model.OrderStatusPENDINGPAYMENT,
+					Status:          model.OrderStatusPendingPayment,
 					TransactionUUID: &transactionUUID,
 					PaymentMethod:   &method,
 				}, nil)
@@ -118,7 +119,7 @@ func TestPay(t *testing.T) {
 			setupMock: func(repo *mocks.OrderRepository, paymentClient *mocks.PaymentClient) {
 				repo.EXPECT().Get(ctx, orderUUID).Return(model.Order{
 					UUID:   orderUUID,
-					Status: model.OrderStatusCANCELLED,
+					Status: model.OrderStatusCancelled,
 				}, nil)
 			},
 			expected: expected{
@@ -135,9 +136,9 @@ func TestPay(t *testing.T) {
 			setupMock: func(repo *mocks.OrderRepository, paymentClient *mocks.PaymentClient) {
 				repo.EXPECT().Get(ctx, orderUUID).Return(model.Order{
 					UUID:   orderUUID,
-					Status: model.OrderStatusPENDINGPAYMENT,
+					Status: model.OrderStatusPendingPayment,
 				}, nil)
-				paymentClient.EXPECT().PayOrder(ctx, orderUUID, method).Return("", status.Error(codes.Internal, "internal"))
+				paymentClient.EXPECT().PayOrder(ctx, orderUUID, method).Return(uuid.Nil, status.Error(codes.Internal, "internal"))
 			},
 			expected: expected{
 				err: status.Error(codes.Internal, "internal"),

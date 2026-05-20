@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	gofakeit "github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
 	errs "github.com/romart333/my-go-microservices/inventory/internal/errors"
@@ -31,7 +32,7 @@ func TestList(t *testing.T) {
 
 		parts = []model.Part{
 			{
-				UUID:          gofakeit.UUID(),
+				UUID:          uuid.MustParse(gofakeit.UUID()),
 				Name:          gofakeit.Name(),
 				Description:   gofakeit.Sentence(),
 				Price:         gofakeit.Int64(),
@@ -40,7 +41,7 @@ func TestList(t *testing.T) {
 				CreatedAt:     gofakeit.Date(),
 			},
 			{
-				UUID:          gofakeit.UUID(),
+				UUID:          uuid.MustParse(gofakeit.UUID()),
 				Name:          gofakeit.Name(),
 				Description:   gofakeit.Sentence(),
 				Price:         gofakeit.Int64(),
@@ -50,7 +51,7 @@ func TestList(t *testing.T) {
 			},
 		}
 		filter = input.PartFilter{
-			UUIDs:    []string{gofakeit.UUID()},
+			UUIDs:    uuid.UUIDs{uuid.MustParse(gofakeit.UUID())},
 			PartType: model.PartType(model.PartType(gofakeit.RandomString([]string{string(model.PartTypeHull), string(model.PartTypeEngine), string(model.PartTypeShield), string(model.PartTypeWeapon)}))),
 		}
 	)
@@ -80,15 +81,6 @@ func TestList(t *testing.T) {
 				repo.EXPECT().List(ctx, filter).Return(nil, errs.ErrPartNotFound)
 			},
 			expected: expected{err: errs.ErrPartNotFound, parts: []model.Part{}},
-		},
-		{
-			name: "ошибка валидации uuid",
-			args: args{
-				filter: input.PartFilter{
-					UUIDs: []string{"invalid-uuid"},
-				},
-			},
-			expected: expected{err: errs.ErrInvalidUUID, parts: []model.Part{}},
 		},
 	}
 	for _, tc := range tests {

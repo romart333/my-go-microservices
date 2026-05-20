@@ -4,19 +4,21 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/romart333/my-go-microservices/inventory/internal/repository/record"
 )
 
-type PartRepository struct {
-	parts map[string]record.Part
+type repository struct {
+	parts map[uuid.UUID]record.Part
 	sync.RWMutex
 }
 
-func NewPartRepository() *PartRepository {
+func NewPartRepository() *repository {
 	now := time.Now().UTC()
-	parts := map[string]record.Part{
-		"550e8400-e29b-41d4-a716-446655440001": {
-			UUID:          "550e8400-e29b-41d4-a716-446655440001",
+	parts := map[uuid.UUID]record.Part{
+		uuid.MustParse("550e8400-e29b-41d4-a716-446655440001"): {
+			UUID:          uuid.MustParse("550e8400-e29b-41d4-a716-446655440001"),
 			Name:          "Алюминиевый корпус",
 			Description:   "Лёгкий корпус для небольших кораблей",
 			Price:         500000, // 5000₽
@@ -24,8 +26,8 @@ func NewPartRepository() *PartRepository {
 			StockQuantity: 10,
 			CreatedAt:     now,
 		},
-		"550e8400-e29b-41d4-a716-446655440002": {
-			UUID:          "550e8400-e29b-41d4-a716-446655440002",
+		uuid.MustParse("550e8400-e29b-41d4-a716-446655440002"): {
+			UUID:          uuid.MustParse("550e8400-e29b-41d4-a716-446655440002"),
 			Name:          "Титановый корпус",
 			Description:   "Прочный корпус для средних кораблей",
 			Price:         1500000, // 15000₽
@@ -33,8 +35,8 @@ func NewPartRepository() *PartRepository {
 			StockQuantity: 5,
 			CreatedAt:     now,
 		},
-		"550e8400-e29b-41d4-a716-446655440003": {
-			UUID:          "550e8400-e29b-41d4-a716-446655440003",
+		uuid.MustParse("550e8400-e29b-41d4-a716-446655440003"): {
+			UUID:          uuid.MustParse("550e8400-e29b-41d4-a716-446655440003"),
 			Name:          "Ионный двигатель C",
 			Description:   "Базовый ионный двигатель класса C",
 			Price:         300000, // 3000₽
@@ -42,8 +44,8 @@ func NewPartRepository() *PartRepository {
 			StockQuantity: 8,
 			CreatedAt:     now,
 		},
-		"550e8400-e29b-41d4-a716-446655440004": {
-			UUID:          "550e8400-e29b-41d4-a716-446655440004",
+		uuid.MustParse("550e8400-e29b-41d4-a716-446655440004"): {
+			UUID:          uuid.MustParse("550e8400-e29b-41d4-a716-446655440004"),
 			Name:          "Ионный двигатель B",
 			Description:   "Улучшенный ионный двигатель класса B",
 			Price:         800000, // 8000₽
@@ -51,8 +53,8 @@ func NewPartRepository() *PartRepository {
 			StockQuantity: 3,
 			CreatedAt:     now,
 		},
-		"550e8400-e29b-41d4-a716-446655440005": {
-			UUID:          "550e8400-e29b-41d4-a716-446655440005",
+		uuid.MustParse("550e8400-e29b-41d4-a716-446655440005"): {
+			UUID:          uuid.MustParse("550e8400-e29b-41d4-a716-446655440005"),
 			Name:          "Энергетический щит",
 			Description:   "Стандартный энергетический щит",
 			Price:         400000, // 4000₽
@@ -60,8 +62,8 @@ func NewPartRepository() *PartRepository {
 			StockQuantity: 6,
 			CreatedAt:     now,
 		},
-		"550e8400-e29b-41d4-a716-446655440006": {
-			UUID:          "550e8400-e29b-41d4-a716-446655440006",
+		uuid.MustParse("550e8400-e29b-41d4-a716-446655440006"): {
+			UUID:          uuid.MustParse("550e8400-e29b-41d4-a716-446655440006"),
 			Name:          "Лазерная пушка",
 			Description:   "Точная лазерная пушка",
 			Price:         250000, // 2500₽
@@ -69,8 +71,8 @@ func NewPartRepository() *PartRepository {
 			StockQuantity: 7,
 			CreatedAt:     now,
 		},
-		"550e8400-e29b-41d4-a716-446655440007": {
-			UUID:          "550e8400-e29b-41d4-a716-446655440007",
+		uuid.MustParse("550e8400-e29b-41d4-a716-446655440007"): {
+			UUID:          uuid.MustParse("550e8400-e29b-41d4-a716-446655440007"),
 			Name:          "Плазменный корпус",
 			Description:   "Плазменный корпус",
 			Price:         2000000, // 20000₽
@@ -80,5 +82,5 @@ func NewPartRepository() *PartRepository {
 		},
 	}
 
-	return &PartRepository{parts: parts}
+	return &repository{parts: parts}
 }

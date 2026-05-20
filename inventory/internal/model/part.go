@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 const (
 	PartTypeUnspecified PartType = "UNSPECIFIED"
@@ -12,7 +16,7 @@ const (
 
 // Part представляет деталь космического корабля
 type Part struct {
-	UUID          string
+	UUID          uuid.UUID
 	Name          string
 	Description   string
 	Price         int64

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
 	errs "github.com/romart333/my-go-microservices/order/internal/errors"
@@ -17,7 +18,7 @@ func TestGet(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		orderUUID string
+		orderUUID uuid.UUID
 	}
 
 	type expected struct {
@@ -26,15 +27,34 @@ func TestGet(t *testing.T) {
 
 	var (
 		ctx       = context.Background()
-		orderUUID = gofakeit.UUID()
+		orderUUID = uuid.MustParse(gofakeit.UUID())
 
 		expectedOrder = model.Order{
-			UUID:       orderUUID,
-			HullUUID:   gofakeit.UUID(),
-			EngineUUID: gofakeit.UUID(),
-			TotalPrice: gofakeit.Int64(),
-			Status:     model.OrderStatusPENDINGPAYMENT,
-			CreatedAt:  gofakeit.Date(),
+			UUID: orderUUID,
+			Items: []model.OrderItem{
+				{
+					PartUUID: uuid.MustParse(gofakeit.UUID()),
+					PartType: model.PartTypeHull,
+					Price:    gofakeit.Int64(),
+				},
+				{
+					PartUUID: uuid.MustParse(gofakeit.UUID()),
+					PartType: model.PartTypeEngine,
+					Price:    gofakeit.Int64(),
+				},
+				{
+					PartUUID: uuid.MustParse(gofakeit.UUID()),
+					PartType: model.PartTypeShield,
+					Price:    gofakeit.Int64(),
+				},
+				{
+					PartUUID: uuid.MustParse(gofakeit.UUID()),
+					PartType: model.PartTypeWeapon,
+					Price:    gofakeit.Int64(),
+				},
+			},
+			Status:    model.OrderStatusPendingPayment,
+			CreatedAt: gofakeit.Date(),
 		}
 	)
 

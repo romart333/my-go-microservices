@@ -4,23 +4,21 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
+
 	errs "github.com/romart333/my-go-microservices/order/internal/errors"
 	"github.com/romart333/my-go-microservices/order/internal/model"
 )
 
-func (s *OrderService) Cancel(ctx context.Context, uuid string) error {
-	if uuid == "" {
-		return errs.ErrOrderIdRequired
-	}
-
+func (s *service) Cancel(ctx context.Context, uuid uuid.UUID) error {
 	order, err := s.orderRepository.Get(ctx, uuid)
 	if err != nil {
 		return fmt.Errorf("получить заказ: %w", err)
 	}
 
 	switch order.Status {
-	case model.OrderStatusPENDINGPAYMENT:
-		order.Status = model.OrderStatusCANCELLED
+	case model.OrderStatusPendingPayment:
+		order.Status = model.OrderStatusCancelled
 		err = s.orderRepository.Update(ctx, order)
 		if err != nil {
 			return fmt.Errorf("обновить заказ: %w", err)
@@ -28,7 +26,7 @@ func (s *OrderService) Cancel(ctx context.Context, uuid string) error {
 		return nil
 	case model.OrderStatusPAID:
 		return errs.ErrOrderAlreadyPaid
-	case model.OrderStatusCANCELLED:
+	case model.OrderStatusCancelled:
 		return errs.ErrOrderCancelled
 	}
 

@@ -10,7 +10,8 @@ package mocks
 import (
 	"context"
 
-	"github.com/romart333/my-go-microservices/payment/internal/input"
+	"github.com/google/uuid"
+	"github.com/romart333/my-go-microservices/payment/internal/service/input"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -42,22 +43,24 @@ func (_m *PaymentService) EXPECT() *PaymentService_Expecter {
 }
 
 // Pay provides a mock function for the type PaymentService
-func (_mock *PaymentService) Pay(ctx context.Context, req input.PayOrderInput) (string, error) {
+func (_mock *PaymentService) Pay(ctx context.Context, req input.PayOrderInput) (uuid.UUID, error) {
 	ret := _mock.Called(ctx, req)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Pay")
 	}
 
-	var r0 string
+	var r0 uuid.UUID
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, input.PayOrderInput) (string, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, input.PayOrderInput) (uuid.UUID, error)); ok {
 		return returnFunc(ctx, req)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, input.PayOrderInput) string); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, input.PayOrderInput) uuid.UUID); ok {
 		r0 = returnFunc(ctx, req)
 	} else {
-		r0 = ret.Get(0).(string)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, input.PayOrderInput) error); ok {
 		r1 = returnFunc(ctx, req)
@@ -97,12 +100,12 @@ func (_c *PaymentService_Pay_Call) Run(run func(ctx context.Context, req input.P
 	return _c
 }
 
-func (_c *PaymentService_Pay_Call) Return(s string, err error) *PaymentService_Pay_Call {
-	_c.Call.Return(s, err)
+func (_c *PaymentService_Pay_Call) Return(uUID uuid.UUID, err error) *PaymentService_Pay_Call {
+	_c.Call.Return(uUID, err)
 	return _c
 }
 
-func (_c *PaymentService_Pay_Call) RunAndReturn(run func(ctx context.Context, req input.PayOrderInput) (string, error)) *PaymentService_Pay_Call {
+func (_c *PaymentService_Pay_Call) RunAndReturn(run func(ctx context.Context, req input.PayOrderInput) (uuid.UUID, error)) *PaymentService_Pay_Call {
 	_c.Call.Return(run)
 	return _c
 }

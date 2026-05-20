@@ -3,12 +3,14 @@ package order
 import (
 	"context"
 
+	"github.com/google/uuid"
+
 	errs "github.com/romart333/my-go-microservices/order/internal/errors"
 	"github.com/romart333/my-go-microservices/order/internal/model"
 	"github.com/romart333/my-go-microservices/order/internal/repository/converter"
 )
 
-func (s *OrderStore) Get(_ context.Context, uuid string) (model.Order, error) {
+func (s *repository) Get(_ context.Context, uuid uuid.UUID) (model.Order, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 

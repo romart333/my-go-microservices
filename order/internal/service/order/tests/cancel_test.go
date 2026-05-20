@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
 	errs "github.com/romart333/my-go-microservices/order/internal/errors"
@@ -17,7 +18,7 @@ func TestCancel(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		orderUUID string
+		orderUUID uuid.UUID
 	}
 
 	type expected struct {
@@ -26,7 +27,7 @@ func TestCancel(t *testing.T) {
 
 	var (
 		ctx       = context.Background()
-		orderUUID = gofakeit.UUID()
+		orderUUID = uuid.MustParse(gofakeit.UUID())
 	)
 
 	tests := []struct {
@@ -44,13 +45,13 @@ func TestCancel(t *testing.T) {
 				repo.EXPECT().
 					Get(ctx, orderUUID).
 					Return(model.Order{
-						UUID:   orderUUID,
-						Status: model.OrderStatusPENDINGPAYMENT,
+						UUID:   (orderUUID),
+						Status: model.OrderStatusPendingPayment,
 					}, nil)
 				repo.EXPECT().
 					Update(ctx, model.Order{
 						UUID:   orderUUID,
-						Status: model.OrderStatusCANCELLED,
+						Status: model.OrderStatusCancelled,
 					}).
 					Return(nil)
 			},
@@ -80,7 +81,7 @@ func TestCancel(t *testing.T) {
 					Get(ctx, orderUUID).
 					Return(model.Order{
 						UUID:   orderUUID,
-						Status: model.OrderStatusCANCELLED,
+						Status: model.OrderStatusCancelled,
 					}, nil)
 			},
 			expected: expected{err: errs.ErrOrderCancelled},

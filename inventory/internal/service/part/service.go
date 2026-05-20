@@ -1,9 +1,9 @@
 package part
 
-type PartService struct {
+type service struct {
 	partRepository PartRepository
 }
 
-func NewPartService(partRepository PartRepository) *PartService {
-	return &PartService{partRepository: partRepository}
+func NewPartService(partRepository PartRepository) *service {
+	return &service{partRepository: partRepository}
 }

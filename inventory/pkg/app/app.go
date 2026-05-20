@@ -20,6 +20,6 @@ func RegisterServices(grpcServer *grpc.Server) {
 
 func Interceptors() []grpc.ServerOption {
 	return []grpc.ServerOption{
-		grpc.UnaryInterceptor(interceptor.LoggerInterceptor),
+		grpc.UnaryInterceptor(interceptor.ErrorInterceptor),
 	}
 }

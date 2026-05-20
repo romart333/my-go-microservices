@@ -2,24 +2,30 @@ package interceptor
 
 import (
 	"context"
+	"errors"
 	"log/slog"
-	"path"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	errs "github.com/romart333/my-go-microservices/payment/internal/errors"
 )
 
-func LoggerInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	method := path.Base(info.FullMethod)
-	slog.Info("начало grpc метода", "method", method)
-
+func ErrorInterceptor(
+	ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler,
+) (any, error) {
 	resp, err := handler(ctx, req)
-	if err != nil {
-		st, _ := status.FromError(err)
-		slog.Error("error", "error", err, "method", info.FullMethod, "status", st.Code(), "message", st.Message())
-	} else {
-		slog.Info("успешное завершение grpc метода", "method", method)
+	if err == nil {
+		return resp, nil
 	}
 
-	return resp, err
+	slog.ErrorContext(ctx, "обработка gRPC-запроса", "method", info.FullMethod, "error", err)
+
+	switch {
+	case errors.Is(err, errs.ErrInvalidPaymentMethod), errors.Is(err, errs.ErrInvalidOrderUUID):
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	default:
+		return nil, status.Error(codes.Internal, "внутренняя ошибка")
+	}
 }
