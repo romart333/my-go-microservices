@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/romart333/my-go-microservices/order/tests/testutil"
 	"github.com/stretchr/testify/require"
+
+	"github.com/romart333/my-go-microservices/order/tests/testutil"
 )
 
 // Тесты этого файла дополняют api_test.go: после публичных API-вызовов

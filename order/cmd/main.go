@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
@@ -38,6 +39,8 @@ const (
 	writeTimeout      = 15 * time.Second
 	idleTimeout       = 60 * time.Second
 	shutdownTimeout   = 10 * time.Second
+	dbPingTimeout     = 5 * time.Second
+	dbQueryTimeout    = 5 * time.Second
 )
 
 func main() {
@@ -78,7 +81,28 @@ func main() {
 	inventoryClient := inventoryv1.NewInventoryServiceClient(inventoryConn)
 	paymentClient := paymentv1.NewPaymentServiceClient(paymentConn)
 
-	router, err := app.NewHTTPHandler(&inventoryClient, &paymentClient)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+	defer cancel()
+
+	orderPool, err := pgxpool.New(ctx, os.Getenv("DB_URI"))
+	if err != nil {
+		slog.Error("создание пула соединений", "error", err)
+		return
+	}
+	defer orderPool.Close()
+
+	pingCtx, cancelPing := context.WithTimeout(ctx, dbPingTimeout)
+	defer cancelPing()
+
+	err = orderPool.Ping(pingCtx)
+	if err != nil {
+		slog.Error("проверка соединения с БД", "error", err)
+		return
+	}
+
+	slog.Info("подключение к PostgreSQL установлено")
+
+	router, err := app.NewHTTPHandler(orderPool, txManager, &inventoryClient, &paymentClient)
 	if err != nil {
 		slog.Error("ошибка создания сервера OpenAPI", "error", err)
 		return
@@ -92,8 +116,6 @@ func main() {
 		WriteTimeout:      writeTimeout,
 		IdleTimeout:       idleTimeout,
 	}
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
-	defer cancel()
 
 	go func() {
 		slog.Info("запуск OrderService", "port", httpPort)

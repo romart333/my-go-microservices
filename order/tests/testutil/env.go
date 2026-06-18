@@ -11,14 +11,15 @@ import (
 	trmpgx "github.com/avito-tech/go-transaction-manager/drivers/pgxv5/v2"
 	"github.com/avito-tech/go-transaction-manager/trm/v2/manager"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/test/bufconn"
+
 	invApp "github.com/romart333/my-go-microservices/inventory/pkg/app"
 	"github.com/romart333/my-go-microservices/order/pkg/app"
 	payApp "github.com/romart333/my-go-microservices/payment/pkg/app"
 	inventoryv1 "github.com/romart333/my-go-microservices/shared/pkg/proto/inventory/v1"
 	paymentv1 "github.com/romart333/my-go-microservices/shared/pkg/proto/payment/v1"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/test/bufconn"
 )
 
 const bufSize = 1024 * 1024

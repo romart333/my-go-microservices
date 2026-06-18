@@ -9,12 +9,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/romart333/my-go-microservices/order/tests/testutil"
-	inventoryv1 "github.com/romart333/my-go-microservices/shared/pkg/proto/inventory/v1"
-	paymentv1 "github.com/romart333/my-go-microservices/shared/pkg/proto/payment/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
+
+	"github.com/romart333/my-go-microservices/order/tests/testutil"
+	inventoryv1 "github.com/romart333/my-go-microservices/shared/pkg/proto/inventory/v1"
+	paymentv1 "github.com/romart333/my-go-microservices/shared/pkg/proto/payment/v1"
 )
 
 func TestMain(m *testing.M) {

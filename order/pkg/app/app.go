@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	manager "github.com/avito-tech/go-transaction-manager/trm/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	api "github.com/romart333/my-go-microservices/order/internal/api/order/v1"
 	inventoryapi "github.com/romart333/my-go-microservices/order/internal/client/grpc/inventory/v1"
@@ -30,7 +32,7 @@ func registerServices(inventoryClient *inventoryv1.InventoryServiceClient, payme
 	return api.NewOrderHandler(service)
 }
 
-func NewHTTPHandler(inventoryClient *inventoryv1.InventoryServiceClient, paymentClient *paymentv1.PaymentServiceClient) (*orderv1.Server, error) {
+func NewHTTPHandler(orderPool *pgxpool.Pool, txManager *manager.Manager, inventoryClient *inventoryv1.InventoryServiceClient, paymentClient *paymentv1.PaymentServiceClient) (*orderv1.Server, error) {
 	h := registerServices(inventoryClient, paymentClient)
 	server, err := orderv1.NewServer(h, orderv1.WithErrorHandler(api.ErrorHandler))
 	if err != nil {
