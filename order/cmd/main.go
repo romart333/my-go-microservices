@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net"
 	"net/http"
@@ -15,7 +16,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
 
-	orderHandler "github.com/romart333/my-go-microservices/order/pkg/handler"
+	"github.com/romart333/my-go-microservices/order/pkg/app"
 	inventoryv1 "github.com/romart333/my-go-microservices/shared/pkg/proto/inventory/v1"
 	paymentv1 "github.com/romart333/my-go-microservices/shared/pkg/proto/payment/v1"
 )
@@ -38,10 +39,16 @@ const (
 	writeTimeout      = 15 * time.Second
 	idleTimeout       = 60 * time.Second
 	shutdownTimeout   = 10 * time.Second
-	middlewareTimeout = 10 * time.Second
 )
 
 func main() {
+	if err := run(); err != nil {
+		slog.Error("OrderService завершился с ошибкой", "error", err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	inventoryConn, err := grpc.NewClient(inventoryServiceAddress,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithKeepaliveParams(keepalive.ClientParameters{
@@ -50,8 +57,7 @@ func main() {
 		}),
 	)
 	if err != nil {
-		slog.Error("не удалось подключиться к InventoryService", "error", err)
-		return
+		return fmt.Errorf("не удалось подключиться к InventoryService: %w", err)
 	}
 	defer func() {
 		if err := inventoryConn.Close(); err != nil {
@@ -67,8 +73,7 @@ func main() {
 		}),
 	)
 	if err != nil {
-		slog.Error("не удалось подключиться к PaymentService", "error", err)
-		return
+		return fmt.Errorf("не удалось подключиться к PaymentService: %w", err)
 	}
 	defer func() {
 		if err := paymentConn.Close(); err != nil {
@@ -76,19 +81,12 @@ func main() {
 		}
 	}()
 
-	// Создаём хранилище и обработчик
-	store := orderHandler.NewOrderStore()
-	h := orderHandler.NewOrderHandler(
-		inventoryv1.NewInventoryServiceClient(inventoryConn),
-		paymentv1.NewPaymentServiceClient(paymentConn),
-		store,
-	)
+	inventoryClient := inventoryv1.NewInventoryServiceClient(inventoryConn)
+	paymentClient := paymentv1.NewPaymentServiceClient(paymentConn)
 
-	// Создать OpenAPI сервер
-	router, err := orderHandler.SetupServer(h)
+	router, err := app.NewHTTPHandler(&inventoryClient, &paymentClient)
 	if err != nil {
-		slog.Error("ошибка создания сервера OpenAPI", "error", err)
-		return
+		return fmt.Errorf("ошибка создания сервера OpenAPI: %w", err)
 	}
 
 	orderServer := &http.Server{
@@ -117,7 +115,8 @@ func main() {
 	defer shutdownCancel()
 
 	if err := orderServer.Shutdown(shutdownCtx); err != nil {
-		slog.Error("ошибка завершения работы OrderService", "error", err)
+		return fmt.Errorf("ошибка завершения работы OrderService: %w", err)
 	}
 	slog.Info("OrderService завершен")
+	return nil
 }

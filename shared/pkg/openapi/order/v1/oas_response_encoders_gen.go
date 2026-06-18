@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
+	ht "github.com/ogen-go/ogen/http"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -26,56 +27,29 @@ func encodeCancelOrderResponse(response CancelOrderRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *CancelOrderBadRequest:
+	case *ErrorStatusCode:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
+		code := response.StatusCode
+		if code == 0 {
+			// Set default status code.
+			code = http.StatusOK
+		}
+		w.WriteHeader(code)
+		if st := http.StatusText(code); code >= http.StatusBadRequest {
+			span.SetStatus(codes.Error, st)
+		} else {
+			span.SetStatus(codes.Ok, st)
+		}
 
 		e := new(jx.Encoder)
-		response.Encode(e)
+		response.Response.Encode(e)
 		if _, err := e.WriteTo(w); err != nil {
 			return errors.Wrap(err, "write")
 		}
 
-		return nil
-
-	case *CancelOrderNotFound:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(404)
-		span.SetStatus(codes.Error, http.StatusText(404))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
+		if code >= http.StatusInternalServerError {
+			return errors.Wrapf(ht.ErrInternalServerErrorResponse, "code: %d, message: %s", code, http.StatusText(code))
 		}
-
-		return nil
-
-	case *CancelOrderConflict:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(409)
-		span.SetStatus(codes.Error, http.StatusText(409))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *CancelOrderInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
 		return nil
 
 	default:
@@ -98,56 +72,29 @@ func encodeCreateOrderResponse(response CreateOrderRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *CreateOrderBadRequest:
+	case *ErrorStatusCode:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
+		code := response.StatusCode
+		if code == 0 {
+			// Set default status code.
+			code = http.StatusOK
+		}
+		w.WriteHeader(code)
+		if st := http.StatusText(code); code >= http.StatusBadRequest {
+			span.SetStatus(codes.Error, st)
+		} else {
+			span.SetStatus(codes.Ok, st)
+		}
 
 		e := new(jx.Encoder)
-		response.Encode(e)
+		response.Response.Encode(e)
 		if _, err := e.WriteTo(w); err != nil {
 			return errors.Wrap(err, "write")
 		}
 
-		return nil
-
-	case *CreateOrderNotFound:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(404)
-		span.SetStatus(codes.Error, http.StatusText(404))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
+		if code >= http.StatusInternalServerError {
+			return errors.Wrapf(ht.ErrInternalServerErrorResponse, "code: %d, message: %s", code, http.StatusText(code))
 		}
-
-		return nil
-
-	case *CreateOrderConflict:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(409)
-		span.SetStatus(codes.Error, http.StatusText(409))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *CreateOrderInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
 		return nil
 
 	default:
@@ -170,43 +117,29 @@ func encodeGetOrderResponse(response GetOrderRes, w http.ResponseWriter, span tr
 
 		return nil
 
-	case *GetOrderBadRequest:
+	case *ErrorStatusCode:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
+		code := response.StatusCode
+		if code == 0 {
+			// Set default status code.
+			code = http.StatusOK
+		}
+		w.WriteHeader(code)
+		if st := http.StatusText(code); code >= http.StatusBadRequest {
+			span.SetStatus(codes.Error, st)
+		} else {
+			span.SetStatus(codes.Ok, st)
+		}
 
 		e := new(jx.Encoder)
-		response.Encode(e)
+		response.Response.Encode(e)
 		if _, err := e.WriteTo(w); err != nil {
 			return errors.Wrap(err, "write")
 		}
 
-		return nil
-
-	case *GetOrderNotFound:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(404)
-		span.SetStatus(codes.Error, http.StatusText(404))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
+		if code >= http.StatusInternalServerError {
+			return errors.Wrapf(ht.ErrInternalServerErrorResponse, "code: %d, message: %s", code, http.StatusText(code))
 		}
-
-		return nil
-
-	case *GetOrderInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
 		return nil
 
 	default:
@@ -229,56 +162,29 @@ func encodePayOrderResponse(response PayOrderRes, w http.ResponseWriter, span tr
 
 		return nil
 
-	case *PayOrderBadRequest:
+	case *ErrorStatusCode:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
+		code := response.StatusCode
+		if code == 0 {
+			// Set default status code.
+			code = http.StatusOK
+		}
+		w.WriteHeader(code)
+		if st := http.StatusText(code); code >= http.StatusBadRequest {
+			span.SetStatus(codes.Error, st)
+		} else {
+			span.SetStatus(codes.Ok, st)
+		}
 
 		e := new(jx.Encoder)
-		response.Encode(e)
+		response.Response.Encode(e)
 		if _, err := e.WriteTo(w); err != nil {
 			return errors.Wrap(err, "write")
 		}
 
-		return nil
-
-	case *PayOrderNotFound:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(404)
-		span.SetStatus(codes.Error, http.StatusText(404))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
+		if code >= http.StatusInternalServerError {
+			return errors.Wrapf(ht.ErrInternalServerErrorResponse, "code: %d, message: %s", code, http.StatusText(code))
 		}
-
-		return nil
-
-	case *PayOrderConflict:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(409)
-		span.SetStatus(codes.Error, http.StatusText(409))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *PayOrderInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
 		return nil
 
 	default:

@@ -9,44 +9,12 @@ import (
 	"github.com/google/uuid"
 )
 
-type CancelOrderBadRequest Error
-
-func (*CancelOrderBadRequest) cancelOrderRes() {}
-
-type CancelOrderConflict Error
-
-func (*CancelOrderConflict) cancelOrderRes() {}
-
-type CancelOrderInternalServerError Error
-
-func (*CancelOrderInternalServerError) cancelOrderRes() {}
-
-type CancelOrderNotFound Error
-
-func (*CancelOrderNotFound) cancelOrderRes() {}
-
 // Пустой ответ при успешной отмене (успех определяется
 // кодом 200).
 // Ref: #
 type CancelOrderResponse struct{}
 
 func (*CancelOrderResponse) cancelOrderRes() {}
-
-type CreateOrderBadRequest Error
-
-func (*CreateOrderBadRequest) createOrderRes() {}
-
-type CreateOrderConflict Error
-
-func (*CreateOrderConflict) createOrderRes() {}
-
-type CreateOrderInternalServerError Error
-
-func (*CreateOrderInternalServerError) createOrderRes() {}
-
-type CreateOrderNotFound Error
-
-func (*CreateOrderNotFound) createOrderRes() {}
 
 // Ref: #
 type CreateOrderRequest struct {
@@ -158,17 +126,36 @@ func (s *Error) SetMessage(val string) {
 	s.Message = val
 }
 
-type GetOrderBadRequest Error
+// ErrorStatusCode wraps Error with StatusCode.
+type ErrorStatusCode struct {
+	StatusCode int
+	Response   Error
+}
 
-func (*GetOrderBadRequest) getOrderRes() {}
+// GetStatusCode returns the value of StatusCode.
+func (s *ErrorStatusCode) GetStatusCode() int {
+	return s.StatusCode
+}
 
-type GetOrderInternalServerError Error
+// GetResponse returns the value of Response.
+func (s *ErrorStatusCode) GetResponse() Error {
+	return s.Response
+}
 
-func (*GetOrderInternalServerError) getOrderRes() {}
+// SetStatusCode sets the value of StatusCode.
+func (s *ErrorStatusCode) SetStatusCode(val int) {
+	s.StatusCode = val
+}
 
-type GetOrderNotFound Error
+// SetResponse sets the value of Response.
+func (s *ErrorStatusCode) SetResponse(val Error) {
+	s.Response = val
+}
 
-func (*GetOrderNotFound) getOrderRes() {}
+func (*ErrorStatusCode) cancelOrderRes() {}
+func (*ErrorStatusCode) createOrderRes() {}
+func (*ErrorStatusCode) getOrderRes()    {}
+func (*ErrorStatusCode) payOrderRes()    {}
 
 // NewOptNilPaymentMethod returns new OptNilPaymentMethod with value set to v.
 func NewOptNilPaymentMethod(v PaymentMethod) OptNilPaymentMethod {
@@ -470,22 +457,6 @@ func (s *OrderStatus) UnmarshalText(data []byte) error {
 		return errors.Errorf("invalid value: %q", data)
 	}
 }
-
-type PayOrderBadRequest Error
-
-func (*PayOrderBadRequest) payOrderRes() {}
-
-type PayOrderConflict Error
-
-func (*PayOrderConflict) payOrderRes() {}
-
-type PayOrderInternalServerError Error
-
-func (*PayOrderInternalServerError) payOrderRes() {}
-
-type PayOrderNotFound Error
-
-func (*PayOrderNotFound) payOrderRes() {}
 
 // Ref: #
 type PayOrderRequest struct {

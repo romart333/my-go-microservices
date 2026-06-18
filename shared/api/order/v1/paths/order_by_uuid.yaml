@@ -14,21 +14,5 @@ get:
         application/json:
           schema:
             $ref: ../components/order_dto.yaml
-    '400':
-      description: Невалидный формат UUID
-      content:
-        application/json:
-          schema:
-            $ref: ../components/errors/error.yaml
-    '404':
-      description: Заказ с указанным UUID не найден
-      content:
-        application/json:
-          schema:
-            $ref: ../components/errors/error.yaml
-    '500':
-      description: Внутренняя ошибка сервера
-      content:
-        application/json:
-          schema:
-            $ref: ../components/errors/error.yaml
+    default:
+      $ref: ../components/responses/error.yaml
