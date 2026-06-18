@@ -9,7 +9,6 @@ func OrderToRecord(o model.Order) record.Order {
 	return record.Order{
 		OrderUUID:       o.UUID,
 		OrderItems:      orderItemsToRecords(o.Items),
-		TotalPrice:      o.TotalPrice(),
 		TransactionUUID: o.TransactionUUID,
 		PaymentMethod:   paymentMethodToRecord(o.PaymentMethod),
 		Status:          orderStatusToRecord(o.Status),

@@ -11,8 +11,8 @@ import (
 )
 
 func (r *repository) Get(ctx context.Context, id uuid.UUID) (model.Part, error) {
-	r.RLock()
-	defer r.RUnlock()
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 	part, ok := r.parts[id]
 	if !ok {
 		return model.Part{}, errs.ErrPartNotFound

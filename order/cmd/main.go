@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net"
 	"net/http"
@@ -41,6 +42,13 @@ const (
 )
 
 func main() {
+	if err := run(); err != nil {
+		slog.Error("OrderService завершился с ошибкой", "error", err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	inventoryConn, err := grpc.NewClient(inventoryServiceAddress,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithKeepaliveParams(keepalive.ClientParameters{
@@ -49,8 +57,7 @@ func main() {
 		}),
 	)
 	if err != nil {
-		slog.Error("не удалось подключиться к InventoryService", "error", err)
-		return
+		return fmt.Errorf("не удалось подключиться к InventoryService: %w", err)
 	}
 	defer func() {
 		if err := inventoryConn.Close(); err != nil {
@@ -66,8 +73,7 @@ func main() {
 		}),
 	)
 	if err != nil {
-		slog.Error("не удалось подключиться к PaymentService", "error", err)
-		return
+		return fmt.Errorf("не удалось подключиться к PaymentService: %w", err)
 	}
 	defer func() {
 		if err := paymentConn.Close(); err != nil {
@@ -80,8 +86,7 @@ func main() {
 
 	router, err := app.NewHTTPHandler(&inventoryClient, &paymentClient)
 	if err != nil {
-		slog.Error("ошибка создания сервера OpenAPI", "error", err)
-		return
+		return fmt.Errorf("ошибка создания сервера OpenAPI: %w", err)
 	}
 
 	orderServer := &http.Server{
@@ -110,7 +115,8 @@ func main() {
 	defer shutdownCancel()
 
 	if err := orderServer.Shutdown(shutdownCtx); err != nil {
-		slog.Error("ошибка завершения работы OrderService", "error", err)
+		return fmt.Errorf("ошибка завершения работы OrderService: %w", err)
 	}
 	slog.Info("OrderService завершен")
+	return nil
 }

@@ -13,15 +13,15 @@ import (
 )
 
 func (r *repository) List(ctx context.Context, filter input.PartFilter) ([]model.Part, error) {
-	r.RLock()
-	defer r.RUnlock()
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 	parts := make([]model.Part, 0, len(r.parts))
 
 	if len(filter.UUIDs) > 0 {
 		for _, uuidStr := range filter.UUIDs {
 			part, ok := r.parts[uuidStr]
 			if !ok {
-				return nil, fmt.Errorf("деталь с uuid %s не найдена: %w", uuidStr, errs.ErrPartNotFound)
+				return nil, fmt.Errorf("uuid %s: %w", uuidStr, errs.ErrPartNotFound)
 			}
 			parts = append(parts, converter.PartToModel(part))
 		}

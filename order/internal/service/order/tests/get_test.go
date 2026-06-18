@@ -6,6 +6,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	errs "github.com/romart333/my-go-microservices/order/internal/errors"
@@ -107,8 +108,8 @@ func TestGet(t *testing.T) {
 				require.ErrorIs(t, err, tc.expected.err)
 			} else {
 				require.NoError(t, err)
-				require.NotEmpty(t, order.UUID)
-				require.Equal(t, order, expectedOrder)
+				assert.NotEmpty(t, order.UUID)
+				require.Equal(t, expectedOrder, order)
 			}
 		})
 	}

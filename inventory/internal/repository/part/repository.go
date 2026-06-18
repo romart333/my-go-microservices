@@ -11,7 +11,7 @@ import (
 
 type repository struct {
 	parts map[uuid.UUID]record.Part
-	sync.RWMutex
+	mu    sync.RWMutex
 }
 
 func NewPartRepository() *repository {
@@ -82,5 +82,5 @@ func NewPartRepository() *repository {
 		},
 	}
 
-	return &repository{parts: parts}
+	return &repository{parts: parts, mu: sync.RWMutex{}}
 }

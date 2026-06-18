@@ -30,7 +30,7 @@ func registerServices(inventoryClient *inventoryv1.InventoryServiceClient, payme
 	return api.NewOrderHandler(service)
 }
 
-func NewHTTPHandler(inventoryClient *inventoryv1.InventoryServiceClient, paymentClient *paymentv1.PaymentServiceClient) (*orderv1.Server, error) {
+func NewHTTPHandler(inventoryClient *inventoryv1.InventoryServiceClient, paymentClient *paymentv1.PaymentServiceClient) (chi.Router, error) {
 	h := registerServices(inventoryClient, paymentClient)
 	server, err := orderv1.NewServer(h, orderv1.WithErrorHandler(api.ErrorHandler))
 	if err != nil {
@@ -43,5 +43,5 @@ func NewHTTPHandler(inventoryClient *inventoryv1.InventoryServiceClient, payment
 	r.Use(middleware.Timeout(middlewareTimeout))
 	r.Use(middleware.Compress(5))
 	r.Handle("/api/*", server)
-	return server, nil
+	return r, nil
 }
